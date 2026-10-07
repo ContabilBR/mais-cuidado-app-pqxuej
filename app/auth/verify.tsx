@@ -100,7 +100,7 @@ export default function VerifyScreen() {
           Digite o código
         </Text>
         <Text style={{ fontFamily: FONTS.regular, fontSize: 16, color: COLORS.textSecondary, lineHeight: 24 }}>
-          Enviamos um SMS para{' '}
+          Enviamos um código pelo WhatsApp para{' '}
           <Text style={{ fontFamily: FONTS.semiBold, color: COLORS.text }}>{pendingPhone}</Text>
         </Text>
       </View>

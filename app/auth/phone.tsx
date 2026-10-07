@@ -73,7 +73,7 @@ export default function PhoneScreen() {
           Qual é o seu telefone?
         </Text>
         <Text style={{ fontFamily: FONTS.regular, fontSize: 16, color: COLORS.textSecondary, lineHeight: 24 }}>
-          Vamos enviar um código por SMS para confirmar
+          Vamos enviar um código pelo WhatsApp para confirmar. Use o número que tem WhatsApp.
         </Text>
       </View>
 

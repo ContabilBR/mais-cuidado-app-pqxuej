@@ -44,7 +44,7 @@ const STORAGE_KEYS = {
 };
 
 /**
- * Modo de desenvolvimento: aceita o código DEV_OTP sem enviar SMS.
+ * Modo de desenvolvimento: aceita o código DEV_OTP sem enviar mensagem.
  * Só funciona com __DEV__ ativo E EXPO_PUBLIC_DEV_OTP_BYPASS=true.
  * Em builds de produção __DEV__ é false, então o atalho nunca existe.
  */
@@ -53,7 +53,7 @@ const DEV_OTP = '123456';
 
 const MSG_NOT_CONFIGURED =
   'O serviço de verificação ainda não está configurado. Tente novamente mais tarde.';
-const MSG_SEND_FAILED = 'Não foi possível enviar o SMS agora. Tente novamente em instantes.';
+const MSG_SEND_FAILED = 'Não foi possível enviar o código pelo WhatsApp agora. Tente novamente em instantes.';
 const MSG_RATE_LIMIT = 'Muitas tentativas. Aguarde alguns minutos e tente novamente.';
 const MSG_INVALID_CODE = 'Código inválido ou expirado. Verifique o código ou peça um novo.';
 const MSG_NETWORK = 'Sem conexão com a internet. Verifique sua rede e tente novamente.';
@@ -167,7 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     if (DEV_BYPASS) {
-      console.log('[Auth] DEV_BYPASS ativo: SMS não enviado. Use o código', DEV_OTP);
+      console.log('[Auth] DEV_BYPASS ativo: código não enviado. Use o código', DEV_OTP);
       setPendingPhone(phone);
       setAuthState('code_verification');
       return { ok: true };
