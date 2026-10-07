@@ -27,17 +27,24 @@ export default function PhoneScreen() {
   const { sendCode } = useAuth();
   const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (text: string) => {
+    setError(null);
     setPhone(formatPhone(text));
   };
 
   const handleSend = async () => {
-    console.log('[Phone] Botão "Enviar código" pressionado, telefone:', phone);
+    if (loading) return;
+    setError(null);
     setLoading(true);
-    await sendCode(phone);
+    const result = await sendCode(phone);
     setLoading(false);
-    router.push('/auth/verify');
+    if (result.ok) {
+      router.push('/auth/verify');
+    } else {
+      setError(result.error);
+    }
   };
 
   const valid = isValidPhone(phone);
@@ -80,17 +87,27 @@ export default function PhoneScreen() {
           backgroundColor: COLORS.surface,
           borderRadius: 14,
           borderWidth: 1.5,
-          borderColor: phone.length > 0 ? COLORS.primary : COLORS.border,
+          borderColor: error ? COLORS.danger : phone.length > 0 ? COLORS.primary : COLORS.border,
           paddingHorizontal: 16,
           paddingVertical: 16,
           fontFamily: FONTS.semiBold,
           fontSize: 20,
           color: COLORS.text,
           letterSpacing: 1,
-          marginBottom: 32,
+          marginBottom: error ? 12 : 32,
         }}
         autoFocus
       />
+
+      {error ? (
+        <Text
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          style={{ fontFamily: FONTS.regular, fontSize: 16, color: COLORS.danger, lineHeight: 24, marginBottom: 24 }}
+        >
+          {error}
+        </Text>
+      ) : null}
 
       <AnimatedPressable
         onPress={handleSend}

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/Colors';
@@ -18,6 +18,7 @@ export default function VerifyScreen() {
   const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const [countdown, setCountdown] = useState(COUNTDOWN_SECONDS);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function VerifyScreen() {
   }, [countdown]);
 
   const handleDigitChange = (text: string, index: number) => {
+    setError(null);
     const digit = text.replace(/\D/g, '').slice(-1);
     const newDigits = [...digits];
     newDigits[index] = digit;
@@ -43,24 +45,31 @@ export default function VerifyScreen() {
   };
 
   const handleConfirm = async () => {
-    const code = digits.join('');
-    console.log('[Verify] Botão "Confirmar" pressionado, código:', code);
+    if (loading) return;
+    setError(null);
     setLoading(true);
-    const success = await verifyCode(code);
+    const result = await verifyCode(digits.join(''));
     setLoading(false);
-    if (success) {
+    if (result.ok) {
       router.replace('/auth/profile-select');
     } else {
-      Alert.alert('Código inválido', 'Por favor, verifique o código e tente novamente.');
+      setError(result.error);
     }
   };
 
   const handleResend = async () => {
-    console.log('[Verify] Botão "Reenviar código" pressionado');
-    await sendCode(pendingPhone);
-    setCountdown(COUNTDOWN_SECONDS);
-    setDigits(Array(CODE_LENGTH).fill(''));
-    inputRefs.current[0]?.focus();
+    if (loading) return;
+    setError(null);
+    setLoading(true);
+    const result = await sendCode(pendingPhone);
+    setLoading(false);
+    if (result.ok) {
+      setCountdown(COUNTDOWN_SECONDS);
+      setDigits(Array(CODE_LENGTH).fill(''));
+      inputRefs.current[0]?.focus();
+    } else {
+      setError(result.error);
+    }
   };
 
   const code = digits.join('');
@@ -123,6 +132,23 @@ export default function VerifyScreen() {
           />
         ))}
       </View>
+
+      {error ? (
+        <Text
+          accessibilityRole="alert"
+          accessibilityLiveRegion="polite"
+          style={{
+            fontFamily: FONTS.regular,
+            fontSize: 16,
+            color: COLORS.danger,
+            lineHeight: 24,
+            textAlign: 'center',
+            marginBottom: 24,
+          }}
+        >
+          {error}
+        </Text>
+      ) : null}
 
       {/* Countdown / Resend */}
       <View style={{ alignItems: 'center', marginBottom: 32 }}>

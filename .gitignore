@@ -70,3 +70,7 @@ htmlcov/
 .cache/
 build/
 next-env.d.ts
+
+# Variáveis de ambiente locais
+.env
+.env.local
